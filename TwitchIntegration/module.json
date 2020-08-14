@@ -1,0 +1,25 @@
+{
+  "Name": "TwitchIntegration",
+  "Description": "A Twitch client that talks directly to HunterPie.",
+  "EntryPoint":  "main.cs",
+  "Author": "Haato",
+  "Version": "1.0.0",
+  "Dependencies": [
+    "Libs\\TwitchLib.Api.Core.dll",
+    "Libs\\TwitchLib.Api.Core.Enums.dll",
+    "Libs\\TwitchLib.Api.Core.Interfaces.dll",
+    "Libs\\TwitchLib.Api.Core.Models.dll",
+    "Libs\\TwitchLib.Api.dll",
+    "Libs\\TwitchLib.Api.Helix.dll",
+    "Libs\\TwitchLib.Api.Helix.Models.dll",
+    "Libs\\TwitchLib.Api.V5.dll",
+    "Libs\\TwitchLib.Api.V5.Models.dll",
+    "Libs\\TwitchLib.Client.dll",
+    "Libs\\TwitchLib.Client.Enums.dll",
+    "Libs\\TwitchLib.Client.Models.dll",
+    "Libs\\TwitchLib.Communication.dll",
+    "Libs\\TwitchLib.PubSub.dll",
+    "Libs\\netstandard.dll",
+    "Libs\\Microsoft.Extensions.Logging.Abstractions.dll"
+  ]
+}
