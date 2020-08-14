@@ -13,7 +13,7 @@ This plugin will create a Twitch bot client, adding Monster Hunter: World relate
 
 This plugin has a `config.json` file to set your Bot information in order for it to connect to Twitch. Open it with a text editor and set the follow information accordingly:
 
-```json
+```js
 {
   "Username": "MyBotName",                  // This is your Bot username
   "OAuth": "oauth:myBotOauthToken1234",     // This is your bot OAuth token prefixed by oauth:, you can get one here: you can get it here: https://twitchapps.com/tmi/
