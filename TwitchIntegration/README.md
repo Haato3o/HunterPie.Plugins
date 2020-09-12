@@ -16,7 +16,7 @@ This plugin has a `config.json` file to set your Bot information in order for it
 ```js
 {
   "Username": "MyBotName",                  // This is your Bot username
-  "OAuth": "oauth:myBotOauthToken1234",     // This is your bot OAuth token prefixed by oauth:, you can get one here: you can get it here: https://twitchapps.com/tmi/
+  "OAuth": "oauth:myBotOauthToken1234",     // This is your bot OAuth token prefixed by oauth:, you can get one here: https://twitchapps.com/tmi/
   "Channel":  "Haato__"                     // This is your channel name
 }
 ```
@@ -32,3 +32,9 @@ Command name | Description | Bot response
 !id,!session          | Sends your current session ID to your Twitch chat. | `Session Id: 1@a2SdxK63aW`
 !build       | Sends your current build to your Twitch chat, the link is to Honey Hunters World, but it's shortened using Tinyurl. | `My current Bow build: https://tinyurl.com/y6av65mw`
 !rank        | Sends your current character basic information to your Twitch chat. | `Lyss \| HR: 308 \| MR: 129 \| Playtime: 43.05:25:30`
+
+## For more custom commands
+
+HunterPie plugins have access to every information HunterPie tracks, see the [Plugin documentation here](https://docs.hunterpie.me/?p=Plugins/plugins.md), if you want to add more commands, you can find the source code for this plugin [here](https://github.com/Haato3o/HunterPie.Plugins/blob/master/TwitchIntegration/main.cs).
+
+> **NOTE:** Don't forget to rename the `main.cs` to anything else after you've compiled it, otherwise HunterPie will compile it over and over every time you start it again.
