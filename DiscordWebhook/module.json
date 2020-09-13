@@ -1,0 +1,11 @@
+{
+  "Name": "DiscordWebhook",
+  "Description": "A HunterPie plugin posts MHW data to Discord.",
+  "EntryPoint":  "main.cs",
+  "Author": "AceLan",
+  "Version": "1.0.0",
+  "Dependencies": [
+    "Libs\\netstandard.dll",
+    "Libs\\Microsoft.Extensions.Logging.Abstractions.dll"
+  ]
+}
