@@ -4,6 +4,7 @@ using HunterPie;
 using System.Linq;
 using HunterPie.Core;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Debugger = HunterPie.Logger.Debugger;
 using System.Windows;
 using System.Windows.Interop;
@@ -23,6 +24,8 @@ namespace HunterPie.Plugins
     IntPtr hWnd;
     HwndSource source;
 
+    // This class is used to store both the damage count and the message
+    // Primarily used to sort the message by the value (highest to lowest)
     public class DamageInformation
     {
       public float DamageValue { get; set; }
@@ -115,6 +118,9 @@ namespace HunterPie.Plugins
     [DllImport("user32.dll")]
     private static extern IntPtr GetMessageExtraInfo();
 
+    public static string configSerialized = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Modules\\DamageChat", "config.json"));
+    ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
+
     public void Initialize(Game context)
     {
       Name = "DamageChat";
@@ -124,9 +130,6 @@ namespace HunterPie.Plugins
 
       SetHotkey();
     }
-
-    public static string configSerialized = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Modules\\DamageChat", "config.json"));
-    ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
 
     public void Unload()
     {
@@ -164,11 +167,21 @@ namespace HunterPie.Plugins
 
         // Key modifiers
         // 0x1 = Alt; 0x2 = Ctrl; 0x4 = Shift
-        int Modifiers = 0x2 | 0x4;
+        // int Modifiers = 0x2 | 0x4; // Default
+
+        bool ALTKEY = (bool)config.Modifiers["ALT"];
+        bool CTRLKEY = (bool)config.Modifiers["CTRL"];
+        bool SHIFTKEY = (bool)config.Modifiers["SHIFT"];
+
+        int? ALTKEYDEF = ALTKEY ? (int)0x1 : (int?)0;
+        int? CTRLKEYDEF = CTRLKEY ? (int)0x2 : (int?)0;
+        int? SHIFTKEYDEF = SHIFTKEY ? (int)0x4 : (int?)0;
+
+        int Modifiers = (int)ALTKEYDEF | (int)CTRLKEYDEF | (int)SHIFTKEYDEF;
 
         // Setting the key to P, you can find the keys here: https://github.com/Haato3o/HunterPie/blob/master/HunterPie/Core/KeyboardHook.cs
         // KeyboardHookHelper.KeyboardKeys key = KeyboardHookHelper.KeyboardKeys.P;
-        KeyboardHookHelper.KeyboardKeys key = (KeyboardHookHelper.KeyboardKeys)Enum.Parse(typeof(KeyboardHookHelper.KeyboardKeys), config.HotKey);
+        KeyboardHookHelper.KeyboardKeys key = (KeyboardHookHelper.KeyboardKeys)Enum.Parse(typeof(KeyboardHookHelper.KeyboardKeys), config.Hotkey);
 
         // Hotkeys also need an id, you can choose whatever you want, just make sure it's unique
         int hotkeyId = 999;
@@ -204,8 +217,8 @@ namespace HunterPie.Plugins
               {
                 if (member.Name != "" && member.Name != null)
                 {
-                  string DamageString = $"{member.Name} dealt {member.Damage} ({(Math.Floor(member.DamagePercentage * 100) / 100) * 100}%) damage";
-                  damageInformation.Add(new DamageInformation { DamageValue = member.Damage, DamageMessage = DamageString });
+                 string DamageString = $"{member.Name} dealt {member.Damage} ({(Math.Floor(member.DamagePercentage * 100) / 100) * 100}%) damage";
+                 damageInformation.Add(new DamageInformation { DamageValue = member.Damage, DamageMessage = DamageString });
                 }
               }
 
@@ -294,7 +307,8 @@ namespace HunterPie.Plugins
 
     internal class ModConfig
     {
-      public string HotKey { get; set; }
+      public string Hotkey { get; set; }
+      public JObject Modifiers { get; set; }
     }
   }
 }

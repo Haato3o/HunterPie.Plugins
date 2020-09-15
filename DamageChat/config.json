@@ -1,3 +1,8 @@
 {
-  "HotKey": "F5"
+  "Hotkey": "F5",
+  "Modifiers": {
+    "ALT": false,
+    "CTRL": true,
+    "SHIFT": true
+  }
 }
