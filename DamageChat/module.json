@@ -1,0 +1,8 @@
+{
+  "Name": "DamageChat",
+  "Description": "Post damage dealt to chat.",
+  "EntryPoint": "main.cs",
+  "Author": "Ricochet",
+  "Version": "1.0.0",
+  "Dependencies": []
+}
