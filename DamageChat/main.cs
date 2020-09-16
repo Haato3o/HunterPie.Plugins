@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using HunterPie;
 using System.Linq;
-using HunterPie.Core;
-using Newtonsoft.Json;
-using Debugger = HunterPie.Logger.Debugger;
 using System.Windows;
-using System.Windows.Interop;
 using System.Threading;
+using System.Windows.Interop;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
+using HunterPie;
+using HunterPie.Core;
+using HunterPie.Core.Input;
+using Debugger = HunterPie.Logger.Debugger;
 
 namespace HunterPie.Plugins
 {
@@ -20,9 +20,12 @@ namespace HunterPie.Plugins
     public string Description { get; set; }
     public Game Context { get; set; }
 
-    IntPtr hWnd;
-    HwndSource source;
+    // This variable will hold our hotkey id that we use to unregister it on unload,
+    // for multiple hotkeys, you can use a List<int> instead, always adding the valid hotkey ids.
+    private int hotKeyId;
 
+    // This class is used to store both the damage count and the message
+    // Primarily used to sort the message by the value (highest to lowest)
     public class DamageInformation
     {
       public float DamageValue { get; set; }
@@ -115,6 +118,9 @@ namespace HunterPie.Plugins
     [DllImport("user32.dll")]
     private static extern IntPtr GetMessageExtraInfo();
 
+    public static string configSerialized = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Modules\\DamageChat", "config.json"));
+    ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
+
     public void Initialize(Game context)
     {
       Name = "DamageChat";
@@ -122,128 +128,74 @@ namespace HunterPie.Plugins
 
       Context = context;
 
-      SetHotkey();
+      SetHotkeys();
     }
 
-    public static string configSerialized = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"Modules\\DamageChat", "config.json"));
-    ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
+    public void SetHotkeys() 
+    {
+      // Hotkey.Register will try to add the hotkey, if it fails it will return -1
+      // if it succeeds then it will return a valid hotkey id that you can use it unregister it.
+      int hkId = Hotkey.Register(config.Hotkey, HotkeyCallback);
+      if (hkId > 0) 
+      {
+        hotKeyId = hkId;
+        this.Log("Hotkey registered successfully!");
+      } 
+      else 
+      {
+        this.Log("Hotkey failed to register.");
+      }
+    }
+
+    public void HotkeyCallback() 
+    {
+      List<Member> members = Context.Player.PlayerParty.Members;
+      List<DamageInformation> damageInformation = new List<DamageInformation>();
+
+      foreach (Member member in members)
+      {
+        if (member.Name != "" && member.Name != null)
+        {
+          string DamageString = $"{member.Name} dealt {member.Damage} ({(Math.Floor(member.DamagePercentage * 100) / 100) * 100}%) damage";
+          damageInformation.Add(new DamageInformation { DamageValue = member.Damage, DamageMessage = DamageString });
+        }
+      }
+
+      List<DamageInformation> sortedDamageInformation = damageInformation.OrderBy(i => i.DamageValue).ToList();
+      sortedDamageInformation.Reverse();
+      foreach (DamageInformation information in sortedDamageInformation)
+      {
+        Clipboard.SetText(information.DamageMessage);
+        KeyMultiEvent(0x1D, 0x2F);
+
+        // We want a short delay before pressing enter otherwise both functions play out at the same time, and sometimes causes nothing to send
+        Thread.Sleep(100);
+        KeyPressEvent(0x1C);
+        Thread.Sleep(100);
+      }
+    }
 
     public void Unload()
     {
-      // Make sure to unregister the hotkey on Unload
-      Application.Current.Dispatcher.Invoke(new Action(() =>
-      {
-        bool success = KeyboardHookHelper.UnregisterHotKey(hWnd, 999);
-
-        // Make sure to remove the hook, so the next time you register a hotkey it won't
-        // call the callback function multiple times
-        source.RemoveHook(HwndHook);
-
-        if (success)
-        {
-          Debugger.Log($"[{Name.ToUpper()}] Successfully unregistered hotkey!");
-        }
-        else
-        {
-          Debugger.Error($"[{Name.ToUpper()}] Failed to unregister hotkey.");
-        }
-      }));
+      // Now we can unregister the hotkey we registered
+      // WE MUST UNREGISTER IT ON UNLOAD, if we don't then:
+      // 1 - We'll create a memory leak that will only be resolved when HunterPie is closed
+      // 2 - We will not be able to register this hotkey again next time the mod loads, unless HunterPie is restarted
+      Hotkey.Unregister(hotKeyId);
     }
 
-    private void SetHotkey()
-    {
-      // We need the current window handle to register a global hotkey
-      // HunterPie is multithreaded, so we should invoke to get the main window handle
-      Application.Current.Dispatcher.Invoke(new Action(() =>
-      {
-        hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
-        source = HwndSource.FromHwnd(hWnd);
-
-        // This is our "callback"
-        source.AddHook(HwndHook);
-
-        // Key modifiers
-        // 0x1 = Alt; 0x2 = Ctrl; 0x4 = Shift
-        int Modifiers = 0x2 | 0x4;
-
-        // Setting the key to P, you can find the keys here: https://github.com/Haato3o/HunterPie/blob/master/HunterPie/Core/KeyboardHook.cs
-        // KeyboardHookHelper.KeyboardKeys key = KeyboardHookHelper.KeyboardKeys.P;
-        KeyboardHookHelper.KeyboardKeys key = (KeyboardHookHelper.KeyboardKeys)Enum.Parse(typeof(KeyboardHookHelper.KeyboardKeys), config.HotKey);
-
-        // Hotkeys also need an id, you can choose whatever you want, just make sure it's unique
-        int hotkeyId = 999;
-
-        // Now we register the hotkey
-        bool success = KeyboardHookHelper.RegisterHotKey(hWnd, hotkeyId, Modifiers, (int)key);
-
-        if (success)
-        {
-          Debugger.Log($"[{Name.ToUpper()}] Successfully registered hotkey!");
-        }
-        else
-        {
-          Debugger.Error($"[{Name.ToUpper()}] Failed to register hotkey.");
-        }
-      }));
-    }
-
-    private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-      const int WM_HOTKEY = 0x0312;
-      switch (msg)
-      {
-        case WM_HOTKEY:
-          switch (wParam.ToInt32())
-          {
-            // Check if it's our hotkey id
-            case 999:
-              List<Member> members = Context.Player.PlayerParty.Members;
-              List<DamageInformation> damageInformation = new List<DamageInformation>();
-
-              foreach (Member member in members)
-              {
-                if (member.Name != "" && member.Name != null)
-                {
-                  string DamageString = $"{member.Name} dealt {member.Damage} ({(Math.Floor(member.DamagePercentage * 100) / 100) * 100}%) damage";
-                  damageInformation.Add(new DamageInformation { DamageValue = member.Damage, DamageMessage = DamageString });
-                }
-              }
-
-              List<DamageInformation> sortedDamageInformation = damageInformation.OrderBy(i => i.DamageValue).ToList();
-              sortedDamageInformation.Reverse();
-              foreach (DamageInformation information in sortedDamageInformation)
-              {
-                Clipboard.SetText(information.DamageMessage);
-                Debugger.Log($"[{Name.ToUpper()}] sent {information.DamageMessage}");
-                KeyComboEvent(0x1D, 0x2F);
-
-                // We want a short delay before pressing enter otherwise both functions play out at the same time, and sometimes causes nothing to send
-                Thread.Sleep(100);
-                KeyPressEvent(0x1C);
-                Thread.Sleep(100);
-              }
-
-              // You can find a full list of DirectInput key codes here:
-              // http://www.flint.jp/misc/?q=dik&lang=en
-              break;
-          }
-          break;
-      }
-      return IntPtr.Zero;
-    }
-
-    private void KeyPressEvent(ushort code)
+    private void KeyPressEvent(ushort one)
     {
       Input[] inputs = new Input[]
       {
-        InputDownEvent(code),
-        InputUpEvent(code)
+        InputDownEvent(one),
+        InputUpEvent(one)
       };
 
       SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
     }
 
-    private void KeyComboEvent(ushort one, ushort two)
+    private void KeyMultiEvent(ushort one, ushort two)
     {
       Input[] inputs = new Input[]
       {
@@ -294,7 +246,7 @@ namespace HunterPie.Plugins
 
     internal class ModConfig
     {
-      public string HotKey { get; set; }
+      public string Hotkey { get; set; }
     }
   }
 }
