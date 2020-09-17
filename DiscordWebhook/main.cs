@@ -1,3 +1,4 @@
+
 using System;
 using System.IO;
 using HunterPie;
@@ -128,14 +129,10 @@ namespace HunterPie.Plugins
                     {
                         // Check if it's our hotkey id
                         case 999: 
-                            Debugger.Log("Hotkey P pressed!");
-                            Debugger.Log($"{DPSString}");
                             if (DPSString != null)
                                 DiscordMsg = $"```{DPSString}```";
                             break;
                         case 998: 
-                            Debugger.Log("Hotkey G pressed!");
-                            Debugger.Log($"{BuildLink}");
                             DiscordMsg = BuildLink;
                             break;
                     }
@@ -164,6 +161,9 @@ namespace HunterPie.Plugins
             Context.Player.OnWeaponChange -= UpdateBuildLink;
             Context.Player.OnPeaceZoneEnter -= StopCalculateDPS;
             Context.Player.OnPeaceZoneLeave -= StartCalculateDPS;
+            Context.FirstMonster.OnHPUpdate -= UpdateDPSString;
+            Context.SecondMonster.OnHPUpdate -= UpdateDPSString;
+            Context.ThirdMonster.OnHPUpdate -= UpdateDPSString;
         }
 
         private void SetupDiscord()
@@ -176,7 +176,6 @@ namespace HunterPie.Plugins
             ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
 
             WebHook = config.Webhook;
-                Debugger.Log($"Webhook: {WebHook}");
        }
 
        private void UpdateBuildLink(object source, EventArgs args)
@@ -186,10 +185,10 @@ namespace HunterPie.Plugins
 
        private void StartCalculateDPS(object source, EventArgs args)
        {
-           Context.FirstMonster.OnHPUpdate += UpdateDPSString;
-           Context.SecondMonster.OnHPUpdate += UpdateDPSString;
-           Context.ThirdMonster.OnHPUpdate += UpdateDPSString;
-       }
+            Context.FirstMonster.OnHPUpdate += UpdateDPSString;
+            Context.SecondMonster.OnHPUpdate += UpdateDPSString;
+            Context.ThirdMonster.OnHPUpdate += UpdateDPSString;
+        }
 
        private void StopCalculateDPS(object source, EventArgs args)
        {
@@ -215,7 +214,6 @@ namespace HunterPie.Plugins
                    DPSString += $"{name} {damage} {percentage*100:0.00}% DPS: {DPS}\n";
                }
            }
-                   Debugger.Log($"{DPSString}");
        }
 
        private void ConvertToTinyUrlSync(string link)
