@@ -4,7 +4,7 @@ This plugin will create a Twitch bot client, adding Monster Hunter: World relate
 
 ## Installation
 
-1. Download the zipped plugin [here](https://cdn.discordapp.com/attachments/743880059680587816/743885283363127376/TwitchIntegration.zip);
+1. Download the zipped plugin [here](https://cdn.discordapp.com/attachments/402557384209203200/756221937788780734/TwitchIntegration.zip);
 2. Extract it's contents to `HunterPie/Modules`;
 3. Edit the `HunterPie/Modules/TwitchIntegration/config.json` and set your bot information and channel name correctly. Read [Setting up your bot](#Setting-up-your-bot) if you need help.
 4. Run HunterPie.

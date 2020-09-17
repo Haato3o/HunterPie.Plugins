@@ -10,7 +10,6 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System.Net;
 using System.Linq;
-using System.Diagnostics;
 
 namespace HunterPie.Plugins
 {
@@ -59,21 +58,21 @@ namespace HunterPie.Plugins
         {
             Context.Player.OnCharacterLogin += UpdateBuildLink;
             Context.Player.OnSessionChange += UpdateBuildLink;
-            Context.Player.OnWeaponChange += UpdateBuildLink;
+            Context.Player.OnClassChange += UpdateBuildLink;
         }
 
         private void UnhookEvents()
         {
             Context.Player.OnCharacterLogin -= UpdateBuildLink;
             Context.Player.OnSessionChange -= UpdateBuildLink;
-            Context.Player.OnWeaponChange -= UpdateBuildLink;
+            Context.Player.OnClassChange -= UpdateBuildLink;
         }
 
         private void SetupTwitchClient()
         {
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "Modules\\TwitchIntegration", "config.json")))
             {
-                throw new FileNotFoundException("Config.json for TwitchClient plugin not found!");
+                Debugger.Error("Config.json for TwitchClient plugin not found!");
                 return;
             }
             string configSerialized = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Modules\\TwitchIntegration", "config.json"));

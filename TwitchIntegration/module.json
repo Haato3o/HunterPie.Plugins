@@ -3,7 +3,7 @@
   "Description": "A Twitch client that talks directly to HunterPie.",
   "EntryPoint":  "main.cs",
   "Author": "Haato",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Dependencies": [
     "Libs\\TwitchLib.Api.Core.dll",
     "Libs\\TwitchLib.Api.Core.Enums.dll",
