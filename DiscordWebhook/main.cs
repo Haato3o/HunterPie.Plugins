@@ -101,14 +101,13 @@ namespace HunterPie.Plugins
 
         private void HookEvents()
         {
-            Context.Player.OnPeaceZoneEnter += StopCalculateDPS;
-            Context.Player.OnPeaceZoneLeave += StartCalculateDPS;
+            Context.FirstMonster.OnHPUpdate += UpdateDPSString;
+            Context.SecondMonster.OnHPUpdate += UpdateDPSString;
+            Context.ThirdMonster.OnHPUpdate += UpdateDPSString;
         }
 
         private void UnhookEvents()
         {
-            Context.Player.OnPeaceZoneEnter -= StopCalculateDPS;
-            Context.Player.OnPeaceZoneLeave -= StartCalculateDPS;
             Context.FirstMonster.OnHPUpdate -= UpdateDPSString;
             Context.SecondMonster.OnHPUpdate -= UpdateDPSString;
             Context.ThirdMonster.OnHPUpdate -= UpdateDPSString;
@@ -131,19 +130,6 @@ namespace HunterPie.Plugins
             BuildLink = Honey.LinkStructureBuilder(Context.Player.GetPlayerGear());
         }
 
-       private void StartCalculateDPS(object source, EventArgs args)
-       {
-            Context.FirstMonster.OnHPUpdate += UpdateDPSString;
-            Context.SecondMonster.OnHPUpdate += UpdateDPSString;
-            Context.ThirdMonster.OnHPUpdate += UpdateDPSString;
-        }
-
-       private void StopCalculateDPS(object source, EventArgs args)
-       {
-           Context.FirstMonster.OnHPUpdate -= UpdateDPSString;
-           Context.SecondMonster.OnHPUpdate -= UpdateDPSString;
-           Context.ThirdMonster.OnHPUpdate -= UpdateDPSString;
-       }
 
        private void UpdateDPSString(object source, MonsterUpdateEventArgs args)
        {
