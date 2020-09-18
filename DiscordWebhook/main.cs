@@ -123,67 +123,66 @@ namespace HunterPie.Plugins
             ModConfig config = JsonConvert.DeserializeObject<ModConfig>(configSerialized);
 
             WebHook = config.Webhook;
-       }
+        }
 
         private void UpdateBuildLink()
         {
             BuildLink = Honey.LinkStructureBuilder(Context.Player.GetPlayerGear());
         }
 
+        private void UpdateDPSString(object source, MonsterUpdateEventArgs args)
+        {
+            Monster sender = (Monster)source;
+            DPSString = $"Damage Meter({sender.Name}) {sender.Health}/{sender.MaxHealth}\n";
+            float TimeElapsed = (float)Context.Player.PlayerParty.Epoch.TotalSeconds - (float)Context.Player.PlayerParty.TimeDifference.TotalSeconds;
+            List<Member> members = Context.Player.PlayerParty.Members;
+            foreach (Member member in members)
+            {
+                string name = member.Name;
+                if (name != "")
+                {
+                    string DPS = $"{member.Damage / TimeElapsed:0.00}/s";
+                    int damage = member.Damage;
+                    float percentage = member.DamagePercentage;
+                    DPSString += $"{name} {damage} {percentage*100:0.00}% DPS: {DPS}\n";
+                }
+            }
+        }
 
-       private void UpdateDPSString(object source, MonsterUpdateEventArgs args)
-       {
-           Monster sender = (Monster)source;
-           DPSString = $"Damage Meter({sender.Name}) {sender.Health}/{sender.MaxHealth}\n";
-           float TimeElapsed = (float)Context.Player.PlayerParty.Epoch.TotalSeconds - (float)Context.Player.PlayerParty.TimeDifference.TotalSeconds;
-           List<Member> members = Context.Player.PlayerParty.Members;
-           foreach (Member member in members)
-           {
-               string name = member.Name;
-               if (name != "")
-               {
-                   string DPS = $"{member.Damage / TimeElapsed:0.00}/s";
-                   int damage = member.Damage;
-                   float percentage = member.DamagePercentage;
-                   DPSString += $"{name} {damage} {percentage*100:0.00}% DPS: {DPS}\n";
-               }
-           }
-       }
+        private void ConvertToTinyUrlSync(string link)
+        {
+            using (WebClient wClient = new WebClient())
+            {
+                wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
+                TinyURL = newUrl;
+            }
+        }
 
-       private void ConvertToTinyUrlSync(string link)
-       {
-           using (WebClient wClient = new WebClient())
-           {
-               wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-               string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
-               TinyURL = newUrl;
-           }
-       }
+        private async void PostToDiscord(string msg)
+        {
+            if (WebHook == null)
+                return;
 
-       private async void PostToDiscord(string msg)
-       {
-           if (WebHook == null)
-               return;
-   
-           using (var httpClient = new HttpClient())
-           {
-               using (var request = new HttpRequestMessage(new HttpMethod("POST"), WebHook))
-               {
-                   var mydata = new
-                   {
-                        username = "",
-                        content = msg
-                   };
-   
-                   request.Content = new StringContent(JsonConvert.SerializeObject(mydata), Encoding.UTF8, "application/json");
-                   var response = await httpClient.SendAsync(request);
-               }
-           }
-       }
-   }
+            using (var httpClient = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(new HttpMethod("POST"), WebHook))
+                {
+                    var mydata = new
+                    {
+                         username = "",
+                         content = msg
+                    };
 
-   internal class ModConfig
-   {
-       public string Webhook { get; set; }
-   }
+                    request.Content = new StringContent(JsonConvert.SerializeObject(mydata), Encoding.UTF8, "application/json");
+                    var response = await httpClient.SendAsync(request);
+                }
+            }
+        }
+    }
+
+    internal class ModConfig
+    {
+        public string Webhook { get; set; }
+    }
 }

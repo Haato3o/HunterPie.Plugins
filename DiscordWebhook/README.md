@@ -4,7 +4,7 @@ This plugin submits data in Monster Hunter: World to specified Discord channel.
 
 ## Installation
 
-1. Download the zipped plugin [here](https://cdn.discordapp.com/attachments/402557384209203200/756267026745655343/DiscordWebhook.zip);
+1. Download the zipped plugin [here](https://cdn.discordapp.com/attachments/652762250746265600/756763311470542948/DiscordWebhook.zip);
 2. Extract it's contents to `HunterPie/Modules`;
 3. Edit the `HunterPie/Modules/DiscordWebhook/config.json` and set your webhook link. Read [Setting up Webhook](#Setting-up-Webhook) if you need help.
 4. Run HunterPie.
