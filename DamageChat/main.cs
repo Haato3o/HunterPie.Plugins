@@ -163,15 +163,23 @@ namespace HunterPie.Plugins
 
       List<DamageInformation> sortedDamageInformation = damageInformation.OrderBy(i => i.DamageValue).ToList();
       sortedDamageInformation.Reverse();
-      foreach (DamageInformation information in sortedDamageInformation)
-      {
-        Clipboard.SetText(information.DamageMessage);
-        KeyMultiEvent(0x1D, 0x2F);
 
-        // We want a short delay before pressing enter otherwise both functions play out at the same time, and sometimes causes nothing to send
-        Thread.Sleep(100);
-        KeyPressEvent(0x1C);
-        Thread.Sleep(100);
+      if (Game.IsWindowFocused) 
+      {
+        foreach (DamageInformation information in sortedDamageInformation)
+        {
+          // SetText can cause errors for some users
+          // Clipboard.SetText(information.DamageMessage);
+          Clipboard.SetData(DataFormats.Text, information.DamageMessage);
+
+          KeyMultiEvent(0x1D, 0x2F);
+
+          // We want a short delay before pressing enter otherwise both functions play out at the same time, and sometimes causes nothing to send
+          Thread.Sleep(100);
+          KeyPressEvent(0x1C);
+          // We use another one here to prevent from two key events firing at the same time
+          Thread.Sleep(100);
+        }
       }
     }
 
