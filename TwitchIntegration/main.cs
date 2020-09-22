@@ -142,12 +142,14 @@ namespace HunterPie.Plugins
 
         private void ConvertToTinyUrlSync(string link)
         {
-            using (WebClient wClient = new WebClient())
-            {
-                wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-                string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
-                TinyURL = newUrl;
-            }
+            try {
+                using (WebClient wClient = new WebClient())
+                {
+                    wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                    string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
+                    TinyURL = newUrl;
+                }
+            } catch {}
         }
     }
 
