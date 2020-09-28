@@ -35,6 +35,7 @@ namespace HunterPie.Plugins
         }
         private string TinyURL { get; set; }
 
+        TwitchStrings strings;
         TwitchClient client { get; set; }
 
         public void Initialize(Game context)
@@ -45,6 +46,7 @@ namespace HunterPie.Plugins
 
             Context = context;
             HookEvents();
+            LoadStrings();
             SetupTwitchClient();
         }
 
@@ -95,6 +97,18 @@ namespace HunterPie.Plugins
             client.Connect();
         }
 
+        private void LoadStrings()
+        {
+            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "Modules\\TwitchIntegration", "strings.json")))
+            {
+                strings = new TwitchStrings();
+            } else
+            {
+                string stringsSerialized = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Modules\\TwitchIntegration", "strings.json"));
+                strings = JsonConvert.DeserializeObject<TwitchStrings>(stringsSerialized);
+            }
+        }
+
         private void DisconnectTwitchClient()
         {
             client.OnMessageReceived -= TwitchOnMessageRecv;
@@ -112,26 +126,31 @@ namespace HunterPie.Plugins
             if (!Context.Player.IsLoggedOn || client == null) return;
 
             string command = e.ChatMessage.Message.Split(' ').FirstOrDefault();
-            switch (command?.ToLower())
+            string parsed;
+            switch (command?.ToLowerInvariant())
             {
                 case "!id":
                 case "!session":
                     if (string.IsNullOrEmpty(Context.Player.SessionID))
                     {
-                        client?.SendMessage(e.ChatMessage.Channel, "I'm currently not in a session :(");
+                        client?.SendMessage(e.ChatMessage.Channel, strings.string_not_in_session);
                     } else
                     {
-                        client?.SendMessage(e.ChatMessage.Channel, $"Session ID: {Context.Player.SessionID}");
+                        parsed = strings.string_session_reply.Replace("{session}", Context.Player.SessionID);
+                        client?.SendMessage(e.ChatMessage.Channel, parsed);
                     }
-                    break;
+                break;
                 case "!build":
-                    client?.SendMessage(e.ChatMessage.Channel, $"Link to my current {Context.Player.WeaponName} build: {TinyURL}");
+                    parsed = strings.string_build_reply.Replace("{weaponName}", Context.Player.WeaponName).Replace("{url}", TinyURL);
+                    client?.SendMessage(e.ChatMessage.Channel, parsed);
                     break;
                 case "!rank":
-                    client?.SendMessage(e.ChatMessage.Channel, $"{Context.Player.Name} | HR: {Context.Player.Level} | MR: {Context.Player.MasterRank} | PlayTime: {TimeSpan.FromSeconds(Context.Player.PlayTime).ToString(@"dd\.hh\:mm\:ss")}");
+                    parsed = strings.string_rank_reply.Replace("{playerName}", Context.Player.Name).Replace("{playerHR}", Context.Player.Level.ToString())
+                        .Replace("playerMR", Context.Player.MasterRank.ToString()).Replace("{playerPlaytime}", TimeSpan.FromSeconds(Context.Player.PlayTime).ToString(@"dd\.hh\:mm\:ss"));
+                    client?.SendMessage(e.ChatMessage.Channel, parsed);
                     break;
                 default:
-                    return;
+                    break;
             }
         }
 
@@ -142,15 +161,24 @@ namespace HunterPie.Plugins
 
         private void ConvertToTinyUrlSync(string link)
         {
-            try {
+            try
+            {
                 using (WebClient wClient = new WebClient())
                 {
                     wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
                     string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
                     TinyURL = newUrl;
                 }
-            } catch {}
+            } catch { }
         }
+    }
+
+    public class TwitchStrings
+    {
+        public string string_not_in_session { get; set; } = "I'm currently not in a session :(";
+        public string string_session_reply { get; set; } = "Session ID: {session}";
+        public string string_build_reply { get; set; } = "Link to my current {weaponName} build: {url}";
+        public string string_rank_reply { get; set; } = "{playerName} | HR: {playerHR} | MR: {playerMR} | PlayTime: {playerPlaytime}";
     }
 
     internal class ModConfig

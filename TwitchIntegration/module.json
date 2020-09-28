@@ -27,6 +27,7 @@
         "MinimumVersion": "1.0.3.97",
         "FileHashes": {
             "config.json": "InstallOnly",
+			"strings.json": "InstallOnly",
             "libs\\Microsoft.Extensions.Logging.Abstractions.dll": "8c7763fce381531dda9e9d6b533599e789f705da613ac711b7c82f8c08185bb4",
             "libs\\netstandard.dll": "8be4a2270f8b2bea40f33f79869fdcca34e07bb764e63b81ded49d90d2b720dd",
             "libs\\TwitchLib.Api.Core.dll": "5aa5dc05eb32a90b560b3640baeed3a37526fd6c85a9d9e13fee23691d4b8636",
@@ -44,7 +45,7 @@
             "libs\\TwitchLib.Communication.dll": "2b3b89ff12e40eff4257ef047febf5ba47a0f7ae465c1e1f619b2c26d2a6ec47",
             "libs\\TwitchLib.LICENSE": "be6c88dd01fcea71f69afbe60ffa8ec4c6940d7da118633309d2711bd410104e",
             "libs\\TwitchLib.PubSub.dll": "c58bd4f5f866a47efeee7c4819a2b0e5ac643c74612c568747c615e06fb3d0b4",
-            "TwitchIntegration.dll": "7254a8692e1e275ce1efc7661d6c633a227ba88a2631ddd8cc1be0205d34261d"
+            "TwitchIntegration.dll": "7d2256440272b2ec71d3da7cf3c96d7cec0c746e6ce1e35f633736b3ccc5ab62"
         }
     }
 }

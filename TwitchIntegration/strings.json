@@ -1,0 +1,6 @@
+{
+    "string_not_in_session": "I'm currently not in a session :(",
+    "string_session_reply": "Session ID: {session}",
+    "string_build_reply": "Link to my current {weaponName} build: {url}",
+    "string_rank_reply": "{playerName} | HR: {playerHR} | MR: {playerMR} | PlayTime: {playerPlaytime}"
+}
