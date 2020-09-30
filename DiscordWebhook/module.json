@@ -3,7 +3,7 @@
     "Description": "A HunterPie plugin posts MHW data to Discord.",
     "EntryPoint": "main.cs",
     "Author": "AceLan",
-    "Version": "1.0.2",
+    "Version": "1.0.3",
     "Dependencies": [
         "Libs\\netstandard.dll",
         "Libs\\Microsoft.Extensions.Logging.Abstractions.dll"
@@ -13,7 +13,7 @@
         "MinimumVersion": "1.0.3.97",
         "FileHashes": {
             "config.json": "InstallOnly",
-            "DiscordWebhook.dll": "b1254fa1af9e425c32d188669cbf471ee4243e6be8288d18ffb7812dcce4baf9",
+            "DiscordWebhook.dll": "802334cd23991cfc88682625ed18475b3b900b4e3bec78ac9e2a5d2c6e803999",
             "libs/Microsoft.Extensions.Logging.Abstractions.dll": "8c7763fce381531dda9e9d6b533599e789f705da613ac711b7c82f8c08185bb4",
             "libs/netstandard.dll": "8be4a2270f8b2bea40f33f79869fdcca34e07bb764e63b81ded49d90d2b720dd"
         }

@@ -1,20 +1,21 @@
-
-using System;
-using System.IO;
 using HunterPie;
 using HunterPie.Core;
 using HunterPie.Core.Events;
 using HunterPie.Core.Input;
 using Debugger = HunterPie.Logger.Debugger;
 using Newtonsoft.Json;
-using System.Net;
-using System.Linq;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Interop;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Forms;
 
 namespace HunterPie.Plugins
 {
@@ -134,19 +135,33 @@ namespace HunterPie.Plugins
         {
             Monster sender = (Monster)source;
             DPSString = $"Damage Meter({sender.Name}) {sender.Health}/{sender.MaxHealth}\n";
+            DPSString += String.Format("{0,-25}{1,10}{2,12}{3,10}{4,10}\n", "Name(HR/MR)", "Weapon", "Damage", "Percent", "DPS");
             float TimeElapsed = (float)Context.Player.PlayerParty.Epoch.TotalSeconds - (float)Context.Player.PlayerParty.TimeDifference.TotalSeconds;
             List<Member> members = Context.Player.PlayerParty.Members;
             foreach (Member member in members)
             {
-                string name = member.Name;
-                if (name != "")
+                string name = FillWithSpaces($"{member.Name}({member.HR}/{member.MR})", 25, 1);
+                string weapon = FillWithSpaces(GStrings.GetWeaponNameByID(member.Weapon), 10, 0);
+                string name_weapon = name + weapon;
+                if (name.Trim() != "(/)")
                 {
-                    string DPS = $"{member.Damage / TimeElapsed:0.00}/s";
+                    float DPS = member.Damage / TimeElapsed;
                     int damage = member.Damage;
-                    float percentage = member.DamagePercentage;
-                    DPSString += $"{name} {damage} {percentage*100:0.00}% DPS: {DPS}\n";
+                    float percentage = member.DamagePercentage*100;
+                    DPSString += String.Format("{0}{1,12:N0}{2,10:0.00}%{3,10:0.00}/s\n", name_weapon, damage, percentage, DPS);
                 }
             }
+        }
+
+        public string FillWithSpaces(string text, int width, int tail)
+        {
+            var font = new Font("Courier New", 10.0F);
+            while (TextRenderer.MeasureText(text, font).Width < width*8)
+                if (tail == 1)
+                    text += ' ';
+                else
+                    text = ' ' + text;
+            return text;
         }
 
         private void ConvertToTinyUrlSync(string link)
