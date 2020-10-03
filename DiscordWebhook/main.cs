@@ -143,7 +143,7 @@ namespace HunterPie.Plugins
                 string name = FillWithSpaces($"{member.Name}({member.HR}/{member.MR})", 25, 1);
                 string weapon = FillWithSpaces(GStrings.GetWeaponNameByID(member.Weapon), 10, 0);
                 string name_weapon = name + weapon;
-                if (name.Trim() != "(/)")
+                if (name.Trim() != "(0/0)")
                 {
                     float DPS = member.Damage / TimeElapsed;
                     int damage = member.Damage;
