@@ -134,9 +134,11 @@ namespace HunterPie.Plugins
         private void UpdateDPSString(object source, MonsterUpdateEventArgs args)
         {
             Monster sender = (Monster)source;
-            DPSString = $"Damage Meter({sender.Name}) {sender.Health}/{sender.MaxHealth}\n";
-            DPSString += String.Format("{0,-25}{1,10}{2,12}{3,10}{4,10}\n", "Name(HR/MR)", "Weapon", "Damage", "Percent", "DPS");
             float TimeElapsed = (float)Context.Player.PlayerParty.Epoch.TotalSeconds - (float)Context.Player.PlayerParty.TimeDifference.TotalSeconds;
+            TimeSpan time = TimeSpan.FromSeconds(TimeElapsed);
+            string duration = time .ToString(@"mm\:ss\:fff");
+            DPSString = String.Format("{0,-15}{1:10}({2}/{3}){4,20}{5}\n", "Damage Meter", sender.Name, sender.Health, sender.MaxHealth, "Time: ", duration);
+            DPSString += String.Format("{0,-25}{1,10}{2,12}{3,10}{4,10}\n", "Name(HR/MR)", "Weapon", "Damage", "Percent", "DPS");
             List<Member> members = Context.Player.PlayerParty.Members;
             foreach (Member member in members)
             {
@@ -148,7 +150,7 @@ namespace HunterPie.Plugins
                     float DPS = member.Damage / TimeElapsed;
                     int damage = member.Damage;
                     float percentage = member.DamagePercentage*100;
-                    DPSString += String.Format("{0}{1,12:N0}{2,10:0.00}%{3,10:0.00}/s\n", name_weapon, damage, percentage, DPS);
+                    DPSString += String.Format("{0:-35}{1,12:N0}{2,10:0.00}%{3,10:0.00}/s\n", name_weapon, damage, percentage, DPS);
                 }
             }
         }
