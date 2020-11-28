@@ -33,7 +33,18 @@ namespace HunterPie.Plugins
                 }
             }
         }
-        private string TinyURL { get; set; }
+        private string tinyUrl;
+        private string TinyURL {
+            get {
+                if (tinyUrl is null) {
+                    UpdateBuildLink(this, EventArgs.Empty);
+                }
+                return tinyUrl;
+            }
+            set {
+                tinyUrl = value;
+            }
+        }
 
         TwitchStrings strings;
         TwitchClient client { get; set; }
@@ -156,7 +167,9 @@ namespace HunterPie.Plugins
 
         private void UpdateBuildLink(object source, EventArgs args)
         {
-            BuildLink = Honey.LinkStructureBuilder(Context.Player.GetPlayerGear());
+            try {
+                BuildLink = Honey.LinkStructureBuilder(Context.Player.GetPlayerGear());
+            } catch {}
         }
 
         private void ConvertToTinyUrlSync(string link)
@@ -165,11 +178,13 @@ namespace HunterPie.Plugins
             {
                 using (WebClient wClient = new WebClient())
                 {
-                    wClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                    wClient.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.441");
                     string newUrl = wClient.DownloadString($"http://tinyurl.com/api-create.php?url={link}");
                     TinyURL = newUrl;
                 }
-            } catch { }
+            } catch(Exception err) {
+                Debugger.Error($"TwitchIntegration error -> {err}");
+            }
         }
     }
 
