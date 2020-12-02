@@ -13,9 +13,9 @@
         "MinimumVersion": "1.0.3.97",
         "FileHashes": {
             "config.json": "InstallOnly",
-            "DiscordWebhook.dll": "bacd05eb537e350c0fe98248d1f33d9cd53ea0a0ac15d89aa9868420c218976a",
-            "libs/Microsoft.Extensions.Logging.Abstractions.dll": "8c7763fce381531dda9e9d6b533599e789f705da613ac711b7c82f8c08185bb4",
-            "libs/netstandard.dll": "8be4a2270f8b2bea40f33f79869fdcca34e07bb764e63b81ded49d90d2b720dd"
+            "DiscordWebhook.dll": "6c41d463078805f380a88cc1bcb3ac3c1a1ea0514e29972c5ef32a358e775f8c",
+            "libs\\Microsoft.Extensions.Logging.Abstractions.dll": "8c7763fce381531dda9e9d6b533599e789f705da613ac711b7c82f8c08185bb4",
+            "libs\\netstandard.dll": "8be4a2270f8b2bea40f33f79869fdcca34e07bb764e63b81ded49d90d2b720dd"
         }
     }
 }
