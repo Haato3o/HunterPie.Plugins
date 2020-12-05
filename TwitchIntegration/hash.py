@@ -13,6 +13,11 @@ class AutoHasher():
         "README.md"
     ]
 
+    INSTALL_ONLY = [
+        "config.json",
+        "strings.json"
+    ]
+
     def __init__(self):
         self.Hashes = {}
     
@@ -43,6 +48,10 @@ class AutoHasher():
         for subpath in os.listdir(path):
             # Skip files that shouldn't be hashed
             if (subpath in AutoHasher.IGNORED_FILES):
+                continue;
+
+            if (subpath in AutoHasher.INSTALL_ONLY):
+                self.Hashes[os.path.join(path if path != None else "", subpath)] = "InstallOnly"
                 continue;
 
             if (os.path.isdir(os.path.join(path if path != None else "", subpath))):

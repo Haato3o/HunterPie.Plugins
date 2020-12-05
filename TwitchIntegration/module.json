@@ -44,7 +44,7 @@
             "libs\\TwitchLib.Communication.dll": "2b3b89ff12e40eff4257ef047febf5ba47a0f7ae465c1e1f619b2c26d2a6ec47",
             "libs\\TwitchLib.LICENSE": "be6c88dd01fcea71f69afbe60ffa8ec4c6940d7da118633309d2711bd410104e",
             "libs\\TwitchLib.PubSub.dll": "c58bd4f5f866a47efeee7c4819a2b0e5ac643c74612c568747c615e06fb3d0b4",
-            "strings.json": "4bcdce75a8ebf99f397ae282abe0099864976be6e4a0208c00d8717ac0976ac9",
+            "strings.json": "InstallOnly",
             "TwitchIntegration.dll": "c6aacb4761615309b682343c9c7dfd835ffa5aa25736fc9a040d0abe9ab2c6d7"
         }
     }
